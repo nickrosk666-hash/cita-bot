@@ -1,7 +1,8 @@
 import requests
 import time
+import re
 
-TOKEN = "PASTE_TOKEN"
+TOKEN = "PASTE_YOUR_TOKEN"
 CHAT_ID = "525629073"
 
 URL = "https://icp.administracionelectronica.gob.es/icpplus/index.html"
@@ -21,9 +22,19 @@ while True:
 
     try:
         r = requests.get(URL, timeout=20)
+        text = r.text
 
-        if "No hay citas disponibles" not in r.text:
-            send("🔥 Возможно появилась запись на CITA Barcelona!")
+        if "No hay citas disponibles" not in text:
+
+            # ищем названия городов
+            cities = re.findall(r'Barcelona[^<]{0,40}', text)
+
+            if cities:
+                city = cities[0]
+            else:
+                city = "Barcelona (точный офис не найден)"
+
+            send(f"🔥 Появилась CITA!\nГород / офис: {city}")
 
         print("checked")
 
